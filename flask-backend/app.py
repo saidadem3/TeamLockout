@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:chill94@localhost/lockout'
+app.config['SECRET_KEY'] = 'af4e8a846e861702dd7e82b3083a0032'
 
 db = SQLAlchemy(app)
 
@@ -45,6 +46,11 @@ class machine(db.Model):
 #     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 #     section_id = db.Column(db.Integer, db.ForeignKey('section.section_id'), nullable=False)
 
+@app.route('/')
+def home():
+    return '''<h1>We Are Team Lockout</h1>
+<p>A prototype API for distant reading of science fiction novels.</p>'''
+
 @app.route('/user', methods=['GET'])
 def get_all_users():
 
@@ -52,18 +58,18 @@ def get_all_users():
 
     output = []
 
-    for user in users:
+    for user in all_users:
         user_data = {}
-        user_data['user_id'] = users.user_id
-        user_data['fname'] = users.fname
-        user_data['lname'] = users.lname
-        user_data['email'] = users.email
-        user_data['admin'] = users.admin
-        user_data['trainer'] = users.trainer
-        user_data['pin'] = users.pin
+        user_data['user_id'] = user.user_id
+        user_data['fname'] = user.fname
+        user_data['lname'] = user.lname
+        user_data['email'] = user.email
+        user_data['admin'] = user.admin
+        user_data['trainer'] = user.trainer
+        user_data['pin'] = user.pin
         output.append(user_data)
 
-    return jsonify({'users' : output})
+    return jsonify({'all_users' : output})
 
 @app.route('/user/<user_id>', methods=['GET'])
 def get_one_user(user_id):
