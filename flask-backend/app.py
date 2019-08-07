@@ -1,7 +1,9 @@
 from flask import Flask
 import psycopg2
+import uuid
 from flask_sqlalchemy import SQLAlchemy
-from flask import request, redirect, url_for, render_template
+from flask import request, redirect, url_for, render_template, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:chill94@localhost/lockout'
@@ -43,9 +45,64 @@ class machine(db.Model):
 #     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 #     section_id = db.Column(db.Integer, db.ForeignKey('section.section_id'), nullable=False)
 
-@app.route("/")
-def my_index():
-    return ("Update")
+@app.route('/user', methods=['GET'])
+def get_all_users():
+
+    all_users = users.query.all()
+
+    output = []
+
+    for user in users:
+        user_data = {}
+        user_data['user_id'] = users.user_id
+        user_data['fname'] = users.fname
+        user_data['lname'] = users.lname
+        user_data['email'] = users.email
+        user_data['admin'] = users.admin
+        user_data['trainer'] = users.trainer
+        user_data['pin'] = users.pin
+        output.append(user_data)
+
+    return jsonify({'users' : output})
+
+@app.route('/user/<user_id>', methods=['GET'])
+def get_one_user(user_id):
+
+    user = users.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return jsonify({'message' : 'No user found!'})
+    
+    user_data = {}
+    user_data['user_id'] = users.user_id
+    user_data['fname'] = users.fname
+    user_data['lname'] = users.lname
+    user_data['email'] = users.email
+    user_data['admin'] = users.admin
+    user_data['trainer'] = users.trainer
+    user_data['pin'] = users.pin
+
+    return jsonify({'user' : user_data})
+
+@app.route('/user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    
+    new_user = users(public_id=str(uuid.uuid4()), name=data['name'], password=hashed_password, admin=False)
+    db.session.add(new_user)
+    db.session.commit()
+    
+    return jsonify({'message' : 'New user created!'})
+
+@app.route('/user/<user_id>', methods=['PUT'])
+def promote_user(user_id):
+    return ''
+
+@app.route('/user', methods=['DELETE'])
+def delete_user():
+    return ''
 
 if __name__ == "__main__":
     app.run(debug=True)
