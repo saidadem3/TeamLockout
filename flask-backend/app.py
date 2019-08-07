@@ -80,13 +80,13 @@ def get_one_user(user_id):
         return jsonify({'message' : 'No user found!'})
     
     user_data = {}
-    user_data['user_id'] = users.user_id
-    user_data['fname'] = users.fname
-    user_data['lname'] = users.lname
-    user_data['email'] = users.email
-    user_data['admin'] = users.admin
-    user_data['trainer'] = users.trainer
-    user_data['pin'] = users.pin
+    user_data['user_id'] = user.user_id
+    user_data['fname'] = user.fname
+    user_data['lname'] = user.lname
+    user_data['email'] = user.email
+    user_data['admin'] = user.admin
+    user_data['trainer'] = user.trainer
+    user_data['pin'] = user.pin
 
     return jsonify({'user' : user_data})
 
