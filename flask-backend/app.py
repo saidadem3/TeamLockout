@@ -110,5 +110,9 @@ def promote_user(user_id):
 def delete_user():
     return ''
 
+@app.route('/redirect')
+def check():
+    return redirect("https://localhost:3000")
+
 if __name__ == "__main__":
     app.run(debug=True)
