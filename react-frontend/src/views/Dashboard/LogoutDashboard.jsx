@@ -19,7 +19,6 @@ import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 import InputLabel from "@material-ui/core/InputLabel";
 
-
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -52,140 +51,133 @@ class LogoutDashboard extends React.Component {
   state = {
     value: 0,
     loggedIn: 0
-
-    };
-    handleLogoutClick = (event, value) => {
+  };
+  handleLogoutClick = (event, value) => {
     console.log("logout");
-     
-      localStorage.setItem('user', JSON.stringify({
-        "username": "loggedOut",
-        "level": 0
-      }) );    
 
-      let user = JSON.parse(localStorage.getItem('user'));
-      console.log("Logged out as "+user.username +" with role: "+user.level);
-      //ADD DATABASE FUNCTION TO SET DATA CHANGED IN USER JSON!!! &&&&*****
-      this.setState({value: 1});
-      console.log("Logged out rerender sidebar "+value);
-      window.location.reload();
-
-    };
+    localStorage.removeItem("user");
+    //ADD DATABASE FUNCTION TO SET DATA CHANGED IN USER JSON!!! &&&&*****
+    this.setState({ value: 1 });
+    console.log("Logged out rerender sidebar " + value);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        username: "Signed out",
+        level: 0
+      })
+    );
+    window.location.reload();
+  };
 
   handleChange = (event, value) => {
-    console.log("handlechange: "+event.target.value);
+    console.log("handlechange: " + event.target.value);
     this.setState({ value });
   };
 
   handleChangeIndex = index => {
     this.setState({ value: index });
-    console.log("handlechangeindex: "+index);
-
+    console.log("handlechangeindex: " + index);
   };
 
-  
   render() {
     const { classes } = this.props;
-    let user = JSON.parse(localStorage.getItem('user'));
-    if(user.level != 0)
-    return (
-      <div>
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={10}>
-          <Card>
-            <CardHeader color="primary">
-              <h4 className={classes.cardTitleWhite}>Logout User</h4>
-              <p className={classes.cardCategoryWhite}>Logout of your account don't forget to do this!</p>
-            </CardHeader>
-            <CardBody>
-              
-            <GridContainer>
-                
-                <GridItem xs={12} sm={12} md={3}>
-                  <CustomInput
-                    labelText= {'UserName: ' + user.username}
-                    id="username"
-                    formControlProps={{
-                      fullWidth: true,
-                      disabled: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <CustomInput
-                    labelText={'Email Address: '+user.emailAddress}
-                    id="emailAddress"
-                    formControlProps={{
-                      fullWidth: true,
-                      disabled: true,
+    let user = JSON.parse(localStorage.getItem("user"));
+    if (user.level != 0)
+      return (
+        <div>
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={10}>
+              <Card>
+                <CardHeader color="primary">
+                  <h4 className={classes.cardTitleWhite}>Logout User</h4>
+                  <p className={classes.cardCategoryWhite}>
+                    Logout of your account don't forget to do this!
+                  </p>
+                </CardHeader>
+                <CardBody>
+                  <GridContainer>
+                    <GridItem xs={12} sm={12} md={3}>
+                      <CustomInput
+                        labelText={"UserName: " + user.username}
+                        id="username"
+                        formControlProps={{
+                          fullWidth: true,
+                          disabled: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <CustomInput
+                        labelText={"Email Address: " + user.emailAddress}
+                        id="emailAddress"
+                        formControlProps={{
+                          fullWidth: true,
+                          disabled: true,
 
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                <CustomInput
-                    labelText={'User Id: '+ user.userId}
-                    id="userId"
-                    formControlProps={{
-                            fullWidth: true,
-                            disabled: true,
-                            onChange: (event) => this.handleChange(event),
-                            type: "text"                            
-                      
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText={'First name: ' + user.firstName}
-                    id="firstName"
-                    formControlProps={{
-                      fullWidth: true,
-                      disabled: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText={'Last name: ' + user.lastName}
-                    id="lastName"
-                    formControlProps={{
-                      fullWidth: true,
-                      disabled: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-              </GridContainer>
-              
-              
-            </CardBody>
-            <CardFooter>
-            {/*}  <Button color="primary" onClick={this.myClick}>Login</Button>*/}
-            <Button color="primary" handleLogoutClick={event => this.handleLogoutClick(event, !this.value)}>Click to Logout</Button>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        
-      </GridContainer>
-    </div>
-    );
-    else
-      return (<div>You are not logged in: {user.username}
-         </div>);
-
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <CustomInput
+                        labelText={"User Id: " + user.userId}
+                        id="userId"
+                        formControlProps={{
+                          fullWidth: true,
+                          disabled: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                  <GridContainer>
+                    <GridItem xs={12} sm={12} md={6}>
+                      <CustomInput
+                        labelText={"First name: " + user.firstName}
+                        id="firstName"
+                        formControlProps={{
+                          fullWidth: true,
+                          disabled: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={6}>
+                      <CustomInput
+                        labelText={"Last name: " + user.lastName}
+                        id="lastName"
+                        formControlProps={{
+                          fullWidth: true,
+                          disabled: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                </CardBody>
+                <CardFooter>
+                  {/*}  <Button color="primary" onClick={this.myClick}>Login</Button>*/}
+                  <Button
+                    color="primary"
+                    handleLogoutClick={event =>
+                      this.handleLogoutClick(event, !this.value)
+                    }
+                  >
+                    Click to Logout
+                  </Button>
+                </CardFooter>
+              </Card>
+            </GridItem>
+          </GridContainer>
+        </div>
+      );
+    else return <div>You are not logged in: {user.username}</div>;
   }
 }
 

@@ -11,14 +11,11 @@ import "assets/css/material-dashboard-react.css?v=1.6.0";
 
 const hist = createBrowserHistory();
 ReactDOM.render(
-    
-  <Router history={hist}>      
+  <Router history={hist}>
     <Switch>
       <Route path="/makerSpaceLockoutSystem" component={Admin} />
       <Route path="/rtl" component={RTL} />
-      <Redirect 
-      from="/" to="/makerSpaceLockoutSystem/login"
-      />
+      <Redirect from="/" to="/makerSpaceLockoutSystem/login" />
     </Switch>
   </Router>,
   document.getElementById("root")

@@ -62,6 +62,7 @@ class Dashboard extends React.Component {
   render() {
     const { classes } = this.props;
     let user = JSON.parse(localStorage.getItem('user'));
+    
     if(user.level === 3)
     return (
       <div>

@@ -18,8 +18,6 @@ import BugReport from "@material-ui/icons/BugReport";
 import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 import InputLabel from "@material-ui/core/InputLabel";
-
-
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -47,223 +45,247 @@ import {
 } from "variables/charts.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import axios from "axios";
 
 class RegisterProfile extends React.Component {
   state = {
-    pin: '',
-    username: '',
-    emailAddress: '',
-    userId: '',
-    firstName: '',
-    lastName: '',
+    user_id: "",
+    fname: "",
+    lname: "",
+    email: "",
+    pin: "",
     level: 1,
     value: 0
+  };
 
-    
-
-    };
-    
-    
-
-
-    handleRegister = () => {
-      console.log("handleRegister: "+JSON.stringify(this.state));
-          //if successfull login @said do the below code 
-          // api call getrole(username,pin); replace level 1 : with =>role
+  handleRegister = () => {
+    console.log("handleRegister: " + JSON.stringify(this.state));
+    //if successfull login @said do the below code
+    // api call getrole(username,pin); replace level 1 : with =>role
 
     //this.setState({level: 1};
-      
 
-
-    console.log("Logged in as "+this.state.username +" with role: "+this.state.level);
+    console.log(
+      "Logged in as " + this.state.username + " with role: " + this.state.level
+    );
     //input validation for now ...
-    if(this.state.username!=''&&this.state.emailAddress!=''&&this.state.userId!=''&&this.state.firstName!=''&&this.state.lastName!='')
-    {
-  
-        //Check if user exists if not create user
+    if (
+      this.state.username != "" &&
+      this.state.emailAddress != "" &&
+      this.state.userId != "" &&
+      this.state.firstName != "" &&
+      this.state.lastName != ""
+    ) {
+      //Check if user exists if not create user
 
-  
-         localStorage.clear('user');
-        var numPin = Math.floor(Math.random()*9000.0)+1000;
+      localStorage.clear("user");
+      var numPin = Math.floor(Math.random() * 9000.0) + 1000;
 
-        this.setState({
-          pin: ''+numPin
-        }, () => {
-        localStorage.setItem('user', JSON.stringify(this.state));   
-        window.location.reload();
+      this.setState({
+        pin: numPin
+      });
+
+      /*const user = {
+        user_id: this.state.user_id,
+        fname: this.state.fname,
+        lname: this.state.lname,
+        email: this.state.email,
+        pin: 332
+      };*/
+      // console.log("User: " + JSON.stringify(user));
+
+      axios
+        .post("http://localhost:5000/user", {
+          user_id: this.state.user_id,
+          fname: this.state.fname,
+          lname: this.state.lname,
+          email: this.state.email,
+          pin: numPin
+        })
+        .then(res => {
+          console.log("Register response: " + res);
+          console.log("Register data response: " + res.data);
+          localStorage.setItem("user", JSON.stringify(this.state));
+
+          window.location.reload();
+        })
+        .catch(function(error) {
+          console.log(error);
         });
 
-        /*  this.setState({pin: ''+numPin});
-        localStorage.setItem('user', JSON.stringify(this.state)); */  
-
-        //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&
-        //window.location.reload();
-        }
-        else // form validation
+      /*
+      this.setState(
         {
-              if(this.state.value==0) {
-                this.setState({value: !this.state.value});
-                setTimeout(function(){
-                    this.setState({value: 0});
-                }.bind(this),1000);  // wait 5 seconds, then reset to false
-          }
-        }
-    };
-  
+          pin: numPin
+        },
+        () => {
+          const user = JSON.parse({
+            user_id: this.state.user_id,
+            fname: this.state.fname,
+            lname: this.state.lname,
+            email: this.state.email,
+            pin: numPin
+          });
+          console.log("User: " + JSON.stringify(user));
+          axios.post("http://localhost:5000/user", { user }).then(res => {
+            console.log("Register response: " + res);
+            console.log("Register data response: " + res.data);
+            localStorage.setItem("user", JSON.stringify(this.state));
 
-   
+            window.location.reload();
+          });
+        }
+      );*/
+
+      /*  this.setState({pin: ''+numPin});
+        localStorage.setItem('user', JSON.stringify(this.state)); */
+
+      //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&
+      //window.location.reload();
+    } // form validation
+    else {
+      if (this.state.value == 0) {
+        this.setState({ value: !this.state.value });
+        setTimeout(
+          function() {
+            this.setState({ value: 0 });
+          }.bind(this),
+          1000
+        ); // wait 5 seconds, then reset to false
+      }
+    }
+  };
 
   handleChange = (event, value) => {
-    console.log("Login Dash handlechange: "+event.target.value);
-    console.log("Login Dash handlechange event target: "+event.target.id);
-    
-    if(event.target.id === 'username')
-    {
-      this.setState({username: event.target.value});
+    console.log("Login Dash handlechange: " + event.target.value);
+    console.log("Login Dash handlechange event target: " + event.target.id);
+
+    if (event.target.id === "user_id") {
+      this.setState({ user_id: event.target.value });
+    } else if (event.target.id === "emailAddress") {
+      this.setState({ email: event.target.value });
+    } else if (event.target.id === "firstName") {
+      this.setState({ fname: event.target.value });
+    } else if (event.target.id === "lastName") {
+      this.setState({ lname: event.target.value });
+    } else {
     }
-    else if(event.target.id ==='userId')
-    {
-      this.setState({userId: event.target.value});
-    }
-    else if(event.target.id ==='username')
-    {
-      this.setState({username: event.target.value});
-    }
-    else if(event.target.id ==='emailAddress')
-    {
-      this.setState({emailAddress: event.target.value});
-    }
-    else if(event.target.id ==='firstName')
-    {
-      this.setState({firstName: event.target.value});
-    }
-    else if(event.target.id ==='lastName')
-    {
-      this.setState({lastName: event.target.value});
-    }
-    else{}
-  
-    console.log("State: "+JSON.stringify(this.state));
+
+    console.log("State: " + JSON.stringify(this.state));
   };
 
   handleChangeIndex = index => {
     this.setState({ value: index });
-    console.log("handlechangeindex: "+index);
-
+    console.log("handlechangeindex: " + index);
   };
 
-  
   render() {
     const { classes } = this.props;
-//    let user = JSON.parse(localStorage.getItem('user'));
-    if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).level===0)
-    return (
-  
-   <div>
-    <GridContainer>
-      <GridItem xs={12} sm={12} md={8}>
-          <Card>
-            <CardHeader color="primary">
-              <h4 className={classes.cardTitleWhite}>Register Profile</h4>
-              <p className={classes.cardCategoryWhite}>Complete your profile</p>
-            </CardHeader>
-            <CardBody>
-              <GridContainer>
-                
-                <GridItem xs={12} sm={12} md={3}>
-                  <CustomInput
-                    labelText="Username"
-                    id="username"
-                    formControlProps={{
-                      fullWidth: true,
-                      required: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <CustomInput
-                    labelText="Email address"
-                    id="emailAddress"
-                    formControlProps={{
-                      fullWidth: true,
-                      required: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                <CustomInput
-                    labelText="UTA ID Number"
-                    id="userId"
-                    formControlProps={{
-                            fullWidth: true,
-                            required: true,
-                            onChange: (event) => this.handleChange(event),
-                            type: "text"                            
-                      
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText="First Name"
-                    id="firstName"
-                    formControlProps={{
-                      fullWidth: true,
-                      required: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText="Last Name"
-                    id="lastName"
-                    formControlProps={{
-                      fullWidth: true,
-                      required: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-              }}
-                  />
-                </GridItem>
-              </GridContainer>
-             
-              
-            </CardBody>
-            <CardFooter>
-            {this.state.value ?  <Button  color="alert" handleLogoutClick={this.handleRegister} >Bad Credentials</Button>
-                :  <Button  color="primary" handleLogoutClick={this.handleRegister} >Register</Button> }
-       {/*     <Button color="primary" handleLogoutClick={this.handleRegister} >Register</Button>*/}
-            </CardFooter>
-          </Card>
-        </GridItem>
-      </GridContainer>
-    </div>
-    );
-    else
-    if(localStorage.getItem('user')!=null)
+    //    let user = JSON.parse(localStorage.getItem('user'));
+    if (
+      localStorage.getItem("user") &&
+      JSON.parse(localStorage.getItem("user")).level === 0
+    )
       return (
-          <div>
-            <h1>>
-          You are logged in as: {JSON.parse(localStorage.getItem('user')).username} Your pin is {JSON.parse(localStorage.getItem('user')).pin} You will need to remember this to login so write it down!
-           </h1>
-         </div>
-         );
-    else
-    return (<div>Youlogged in as: ERROR USER UNDEFINED // 
-    </div>
-    );
+        <div>
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={8}>
+              <Card>
+                <CardHeader color="primary">
+                  <h4 className={classes.cardTitleWhite}>Register Profile</h4>
+                  <p className={classes.cardCategoryWhite}>
+                    Complete your profile
+                  </p>
+                </CardHeader>
+                <CardBody>
+                  <GridContainer>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <CustomInput
+                        labelText="Email address"
+                        id="emailAddress"
+                        formControlProps={{
+                          fullWidth: true,
+                          required: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                      <CustomInput
+                        labelText="UTA ID Number"
+                        id="user_id"
+                        formControlProps={{
+                          fullWidth: true,
+                          required: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                  <GridContainer>
+                    <GridItem xs={12} sm={12} md={6}>
+                      <CustomInput
+                        labelText="First Name"
+                        id="firstName"
+                        formControlProps={{
+                          fullWidth: true,
+                          required: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={6}>
+                      <CustomInput
+                        labelText="Last Name"
+                        id="lastName"
+                        formControlProps={{
+                          fullWidth: true,
+                          required: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                </CardBody>
+                <CardFooter>
+                  {this.state.value ? (
+                    <Button
+                      color="alert"
+                      handleLogoutClick={this.handleRegister}
+                    >
+                      Bad Credentials
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      handleLogoutClick={this.handleRegister}
+                    >
+                      Register
+                    </Button>
+                  )}
+                  {/*     <Button color="primary" handleLogoutClick={this.handleRegister} >Register</Button>*/}
+                </CardFooter>
+              </Card>
+            </GridItem>
+          </GridContainer>
+        </div>
+      );
+    else if (localStorage.getItem("user") != null)
+      return (
+        <div>
+          <h1>
+            > You are logged in as:{" "}
+            {JSON.parse(localStorage.getItem("user")).username} Your pin is{" "}
+            {JSON.parse(localStorage.getItem("user")).pin} You will need to
+            remember this to login so write it down!
+          </h1>
+        </div>
+      );
+    else return <div>Youlogged in as: ERROR USER UNDEFINED //</div>;
   }
 }
 

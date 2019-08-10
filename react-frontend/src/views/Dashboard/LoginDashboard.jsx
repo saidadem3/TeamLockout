@@ -19,7 +19,6 @@ import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 import InputLabel from "@material-ui/core/InputLabel";
 
-
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -35,7 +34,7 @@ import CardFooter from "components/Card/CardFooter.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import CardAvatar from "components/Card/CardAvatar.jsx";
-
+import axios from "axios";
 import avatar from "assets/img/faces/marc.jpg";
 
 import { bugs, website, server } from "variables/general.jsx";
@@ -51,60 +50,118 @@ import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardS
 class LoginDashboard extends React.Component {
   state = {
     value: 0,
-    pin: '',
-    username: ''
+    pin: "",
+    username: "",
+    all_users: [],
+    userlist: []
+  };
 
-    };
-    
-    
+  handleLoginClick1 = () => {
+    console.log(JSON.stringify(this.state.all_users));
+    console.log(JSON.stringify(this.state.all_users.all_users));
+    console.log(
+      "handleLoginClick1: " + this.state.username + " PW: " + this.state.pin
+    );
 
+    axios
+      .get("http://localhost:5000/validate/" + this.state.username)
+      .then(res => {
+        console.log("Login response " + JSON.stringify(res.data));
+        const user = res.data["user"];
 
-    handleLoginClick1 = () => {
-      console.log("handleLoginClick1: "+this.state.username+ " PW: "+this.state.pin);
-      if(this.state.username === 'admin' && this.state.pin ==='1234')
-      {
-        localStorage.setItem('user', JSON.stringify({
-          "username": this.state.username,
-          "level": 3
-        }) );
-        window.location.reload();
+        if (user && user.pin == this.state.pin) {
+          if (user.admin) user.level = 3;
+          else if (user.trainer) user.level = 2;
+          else user.level = 1;
+          console.log("Setlocal user to: " + JSON.stringify(user));
 
+          localStorage.clear("user");
+          localStorage.setItem("user", user);
+          window.location.reload();
+        } else {
+          console.log("Failure login");
+          if (this.state.value == 0) {
+            this.setState({ value: !this.state.value });
+            setTimeout(
+              function() {
+                this.setState({ value: 0 });
+              }.bind(this),
+              1000
+            ); // wait 5 seconds, then reset to false
+          }
+        }
 
+        //console.log({})
+        //  console.log("userlist: " + JSON.stringify(this.state.userlist));
+        // console.log("all: " + JSON.stringify(res.data[0]));
+      });
+
+    /*
+    else {
+      // bad login
+
+      if (this.state.value == 0) {
+        this.setState({ value: !this.state.value });
+        setTimeout(
+          function() {
+            this.setState({ value: 0 });
+          }.bind(this),
+          1000
+        ); // wait 5 seconds, then reset to false
       }
-      else if(this.state.username === 'trainer' && this.state.pin ==='1234')
-      {
-        localStorage.setItem('user', JSON.stringify({
-          "username": this.state.username,
-          "level": 2
-        }) );
-        window.location.reload();
+    }*/
 
+    /*
+  handleLoginClick1 = () => {
+    console.log(JSON.stringify(this.state.all_users));
+    console.log(JSON.stringify(this.state.all_users.all_users));
+    console.log(
+      "handleLoginClick1: " + this.state.username + " PW: " + this.state.pin
+    );
+    if (this.state.username === "admin" && this.state.pin === "1234") {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: this.state.username,
+          level: 3
+        })
+      );
+      window.location.reload();
+    } else if (this.state.username === "trainer" && this.state.pin === "1234") {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: this.state.username,
+          level: 2
+        })
+      );
+      window.location.reload();
+    } else if (this.state.username === "user" && this.state.pin === "1234") {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: this.state.username,
+          level: 1
+        })
+      );
+      window.location.reload();
+    } else {
+      // bad login
+
+      if (this.state.value == 0) {
+        this.setState({ value: !this.state.value });
+        setTimeout(
+          function() {
+            this.setState({ value: 0 });
+          }.bind(this),
+          1000
+        ); // wait 5 seconds, then reset to false
       }
-      else if(this.state.username === 'user' && this.state.pin ==='1234')
-      {
-        localStorage.setItem('user', JSON.stringify({
-          "username": this.state.username,
-          "level": 1
-        }) );
-        window.location.reload();
-
-      }
-      else
-      {// bad login
-
-        if(this.state.value==0) {
-          this.setState({value: !this.state.value});
-          setTimeout(function(){
-               this.setState({value: 0});
-          }.bind(this),1000);  // wait 5 seconds, then reset to false
-     }
-
-        
-      }
-       //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&*/
-          //if successfull login @said do the below code 
-          // api call getrole(username,pin); replace level 1 : with =>role
-/*
+    }*/
+    //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&*/
+    //if successfull login @said do the below code
+    // api call getrole(username,pin); replace level 1 : with =>role
+    /*
     localStorage.setItem('user', JSON.stringify({
       "username": this.username,
       "level": 1
@@ -117,71 +174,89 @@ class LoginDashboard extends React.Component {
     console.log("Logged in as "+user.username +" with role: "+user.level);
     //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&*/
     // window.location.reload();
+  };
 
-    };
-
-    handleLoginClick2 = () => {
-      console.log("handleLoginClick2");
+  componentDidMount() {
+    axios.get("http://localhost:5000/user").then(res => {
+      const all_users = res.data["all_users"];
+      this.setState({ all_users: all_users });
+      //console.log({})
+      //  console.log("userlist: " + JSON.stringify(this.state.userlist));
+      // console.log("all: " + JSON.stringify(res.data[0]));
+    });
+  }
+  handleLoginClick2 = () => {
+    console.log("handleLoginClick2");
     //  this.setState({ loggedIn: 1 });
 
-    localStorage.setItem('user', JSON.stringify({
-      "username": "Trainer Login",
-      "level": 2
-    }) );    
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        username: "Trainer Login",
+        level: 2
+      })
+    );
 
-    let user = JSON.parse(localStorage.getItem('user'));
-    console.log("Logged in as "+user.username +" with role: "+user.level);
+    let user = JSON.parse(localStorage.getItem("user"));
+    console.log("Logged in as " + user.username + " with role: " + user.level);
     //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&
-     window.location.reload();
+    window.location.reload();
+  };
 
-    };
-
-    handleLoginClick3 = () => {
-      console.log("handleLoginClick3");
+  handleLoginClick3 = () => {
+    console.log("handleLoginClick3");
     //  this.setState({ loggedIn: 1 });
 
-    localStorage.setItem('user', JSON.stringify({
-      "username": "Admin Login",
-      "level": 3
-    }) );    
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        username: "Admin Login",
+        level: 3
+      })
+    );
 
-    let user = JSON.parse(localStorage.getItem('user'));
-    console.log("Logged in as "+user.username +" with role: "+user.level);
+    let user = JSON.parse(localStorage.getItem("user"));
+    console.log("Logged in as " + user.username + " with role: " + user.level);
     //UPDATE JSON USER HERE WHEN LOGGING IN!&&&&
-     window.location.reload();
-     console.log("Logged in as "+user.username +" with role: "+user.level);
-
-    };
+    window.location.reload();
+    console.log("Logged in as " + user.username + " with role: " + user.level);
+  };
 
   handleChange = (event, value) => {
-    console.log("Login Dash handlechange: "+event.target.value);
-    console.log("Login Dash handlechange event target: "+event.target.id);
-    
-    if(event.target.id === 'username')
-    {
-      this.setState({username: event.target.value});
+    console.log("Login Dash handlechange: " + event.target.value);
+    console.log("Login Dash handlechange event target: " + event.target.id);
+
+    if (event.target.id === "username") {
+      this.setState({ username: event.target.value });
+    } else if (event.target.id === "pin") {
+      this.setState({ pin: event.target.value });
+    } else {
     }
-    else if(event.target.id ==='pin')
-    {
-      this.setState({pin: event.target.value});
-    }
-    else{}
-  
-    console.log("State: "+this.state.username + " : "+this.state.pin);
+
+    console.log("State: " + this.state.username + " : " + this.state.pin);
   };
 
   handleChangeIndex = index => {
     this.setState({ value: index });
-    console.log("handlechangeindex: "+index);
-
+    console.log("handlechangeindex: " + index);
   };
 
-  
   render() {
     const { classes } = this.props;
-    if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).level===0)
-    return (
-    /* { 
+    if (
+      localStorage.getItem("user") &&
+      JSON.parse(localStorage.getItem("user")).trainer &&
+      JSON.parse(localStorage.getItem("user")).admin
+    )
+      return (
+        <div>
+          You are already logged in as:{" "}
+          {JSON.parse(localStorage.getItem("user")).username}
+        </div>
+      );
+    else {
+      return (
+        /* { 
         if(this.user.level === 3){
             return null;}
         else if(this.user.level === 2){
@@ -190,78 +265,86 @@ class LoginDashboard extends React.Component {
              return null;}
         else
             return null;
+
+
+            
   }*/
-  
-      <div>
-      
-      
-      <GridContainer>
 
-      
-      
-        <GridItem xs={12} sm={12} md={10}>
-          <Card>
-            <CardHeader color="primary">
-              <h4 className={classes.cardTitleWhite}>Login User</h4>
-              <p className={classes.cardCategoryWhite}>Login to your acccount, if you have not created one click register on the sidebar.</p>
-            </CardHeader>
-            <CardBody>
-              
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText="User ID"
-                    id="username"
-                    formControlProps={{
-                            fullWidth: true,
-                            required: true,
-                            onChange: (event) => this.handleChange(event),
-                            type: "text"                            
-                      
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText="Pin"
-                    id="pin"
-                    formControlProps={{
-                      fullWidth: true,
-                      required: true,
-                      onChange: (event) => this.handleChange(event),
-                      type: "text"                            
-                
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-              
-              
-            </CardBody>
-            <CardFooter>
-              {/*}  <Button color="primary" onClick={this.myClick}>Login</Button>*/}
-                {this.state.value ?  <Button  color="alert" handleLogoutClick={this.handleLoginClick1} >Bad Login</Button>
-                :  <Button  color="primary" handleLogoutClick={this.handleLoginClick1} >Login User</Button> }
-          {/*<Button  color="primary" handleLogoutClick={this.handleLoginClick1} >Login User</Button>
-            <Button color="primary" handleLogoutClick={this.handleLoginClick2}>Login Trainer</Button>
-            <Button color="primary" handleLogoutClick={this.handleLoginClick3}>Login Admin</Button>*/}
-
-            </CardFooter>
-          </Card>
-        </GridItem>
-        
-      </GridContainer>
-    </div>
-    );
-    else{
-      if(localStorage.getItem('user'))
-      return (<div>
-        You are already logged in as: {JSON.parse(localStorage.getItem('user')).username}
-        </div>);
-      else
-      return (<div>
-        USER IS UNDEFINED ERROR 
-        </div>);
+        <div>
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={10}>
+              <Card>
+                <CardHeader color="primary">
+                  <h4 className={classes.cardTitleWhite}>Login User</h4>
+                  <p className={classes.cardCategoryWhite}>
+                    Login to your acccount, if you have not created one click
+                    register on the sidebar.
+                  </p>
+                </CardHeader>
+                <CardBody>
+                  <GridContainer>
+                    <GridItem xs={12} sm={12} md={6}>
+                      <CustomInput
+                        labelText="User ID"
+                        id="username"
+                        formControlProps={{
+                          fullWidth: true,
+                          required: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={6}>
+                      <CustomInput
+                        labelText="Pin"
+                        id="pin"
+                        formControlProps={{
+                          fullWidth: true,
+                          required: true,
+                          onChange: event => this.handleChange(event),
+                          type: "text"
+                        }}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                </CardBody>
+                <CardFooter>
+                  {/*}  <Button color="primary" onClick={this.myClick}>Login</Button>*/}
+                  {this.state.value ? (
+                    <Button
+                      color="warning"
+                      handleLogoutClick={this.handleLoginClick1}
+                    >
+                      Bad Login
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      handleLogoutClick={this.handleLoginClick1}
+                    >
+                      Login User
+                    </Button>
+                  )}
+                  {/*<Button  color="primary" handleLogoutClick={this.handleLoginClick1} >Login User</Button>*/}
+                  <Button
+                    color="primary"
+                    handleLogoutClick={this.handleLoginClick2}
+                  >
+                    Login Trainer
+                  </Button>
+                  <Button
+                    color="primary"
+                    handleLogoutClick={this.handleLoginClick3}
+                  >
+                    Login Admin
+                  </Button>
+                </CardFooter>
+              </Card>
+            </GridItem>
+          </GridContainer>
+        </div>
+      );
     }
   }
 }

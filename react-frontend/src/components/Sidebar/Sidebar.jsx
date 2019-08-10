@@ -17,16 +17,12 @@ import RTLNavbarLinks from "components/Navbars/RTLNavbarLinks.jsx";
 import sidebarStyle from "assets/jss/material-dashboard-react/components/sidebarStyle.jsx";
 
 const Sidebar = ({ ...props }) => {
-
   // verifies if routeName is the one active (in browser input)
   function activeRoute(routeName) {
-
     return props.location.pathname.indexOf(routeName) > -1 ? true : false;
   }
   const { classes, color, logo, image, logoText, routes } = props;
-  var links = (
-   //localStorage.clear('user'),
-
+  var links = ( //localStorage.clear("user"),
     <List className={classes.list}>
       {routes.map((prop, key) => {
         var activePro = " ";
@@ -34,38 +30,35 @@ const Sidebar = ({ ...props }) => {
         //Only load sidebar for correct role based on routes prop
         //testing admin as default...
         let user;
-        if(!localStorage.getItem('user'))
-        {
-          localStorage.setItem('user', JSON.stringify({
-            "username": "test",
-            "level": 4
-          }) );
-          user = JSON.parse(localStorage.getItem('user'));
-          console.log("logged in as: "+user.username+" with role: "+user.level);
+        if (!localStorage.getItem("user")) {
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              username: "test",
+              level: 4
+            })
+          );
+          user = JSON.parse(localStorage.getItem("user"));
+          console.log(
+            "logged in as: " + user.username + " with role: " + user.level
+          );
         }
 
+        // user = JSON.parse(localStorage.getItem('user'));
 
-
-     // user = JSON.parse(localStorage.getItem('user'));
-
-      //user.level = 3;  HIDES THE SIDEBARS FROM THE INNAPRORIATE USERS
-      if(localStorage.getItem('user')!=null)
-      {
-      if(JSON.parse(localStorage.getItem('user')).level===3){
-        if(!prop.admin)
-          return null;}
-      else if(JSON.parse(localStorage.getItem('user')).level===2){
-        if(!prop.trainer)
-          return null;}
-      else if(JSON.parse(localStorage.getItem('user')).level===1){
-        if(!prop.user)
-           return null;}
-      else if(JSON.parse(localStorage.getItem('user')).level===0){
-        if(!prop.noAuth)
-          return null;}
-        
-     }
-     /*   else    // if level of role is undefined go here...
+        //user.level = 3;  HIDES THE SIDEBARS FROM THE INNAPRORIATE USERS
+        if (localStorage.getItem("user") != null) {
+          if (JSON.parse(localStorage.getItem("user"))["level"] === 3) {
+            if (!prop.admin) return null;
+          } else if (JSON.parse(localStorage.getItem("user")).level === 2) {
+            if (!prop.trainer) return null;
+          } else if (JSON.parse(localStorage.getItem("user")).level === 1) {
+            if (!prop.user) return null;
+          } else if (JSON.parse(localStorage.getItem("user")).level === 0) {
+            if (!prop.noAuth) return null;
+          }
+        }
+        /*   else    // if level of role is undefined go here...
         {
           if(!prop.noAuth)
             return null;
@@ -136,8 +129,6 @@ const Sidebar = ({ ...props }) => {
             return null;
         }*/
 
-
-       
         if (prop.path === "/upgrade-to-pro") {
           activePro = classes.activePro + " ";
           listItemClasses = classNames({
@@ -175,9 +166,7 @@ const Sidebar = ({ ...props }) => {
                 />
               )}
               <ListItemText
-                primary={
-                  props.rtlActive ? prop.rtlName : prop.name
-                }
+                primary={props.rtlActive ? prop.rtlName : prop.name}
                 className={classNames(classes.itemText, whiteFontClasses, {
                   [classes.itemTextRTL]: props.rtlActive
                 })}
